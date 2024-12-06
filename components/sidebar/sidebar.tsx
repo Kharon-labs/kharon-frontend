@@ -17,7 +17,7 @@ import { GiEgyptianProfile } from "react-icons/gi";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import Image from "next/image";
+import { WalletConnectButton } from "../wallet/connect-button";
 
 function Sidebar() {
   const pathname = usePathname();
@@ -64,31 +64,7 @@ function Sidebar() {
       </div>
 
       <div className="mb-6">
-        <div className="relative p-[1px] rounded-lg bg-gradient-to-b from-[#3b82f6] via-[#8b5cf6] to-[#ec4899]">
-          <div className="px-4 py-2 bg-black rounded-lg">
-            <div className="flex flex-col items-center gap-1.5">
-              <Image
-                src="/wallet.png"
-                alt="Wallet"
-                width={20}
-                height={20}
-                className="mb-1"
-              />
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] text-white">
-                  {formatWalletAddress(walletAddress)}
-                </span>
-                <button
-                  onClick={handleCopy}
-                  className="text-gray-400 hover:text-[#009FDF] transition-colors"
-                  title={isCopied ? "Copied!" : "Copy address"}
-                >
-                  <IconCopy className="w-3 h-3" />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <WalletConnectButton />
       </div>
 
       <nav className="flex-1">

@@ -118,3 +118,15 @@
 .gradient-border-form:hover::before {
   opacity: 0.8;
 }
+
+.wallet-connect-modal {
+  @apply bg-black border-neutral-800;
+}
+
+.wallet-option {
+  @apply transition-all duration-200;
+}
+
+.wallet-option:hover {
+  @apply bg-neutral-800;
+}

@@ -4,7 +4,9 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { AuthProvider } from "./providers";
+import { StarknetProvider } from "@/components/starknet/starknet-provider";
 import { Toaster } from "sonner";
+import { WalletProvider } from "@/contexts/wallet-context";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -43,13 +45,17 @@ export default function RootLayout({
         className={`${poppins.variable} ${inriaSans.variable} ${inter.variable} bg-[#000] text-[#fff]`}
       >
         <AuthProvider>
-          <Providers>
-            <div className=" h-screen flex flex-row justify-start">
-              <main className=" flex-1 w-full max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
-                {children}
-              </main>
-            </div>
-          </Providers>
+          <StarknetProvider>
+            <WalletProvider>
+              <Providers>
+                <div className=" h-screen flex flex-row justify-start">
+                  <main className=" flex-1 w-full max-w-[1536px] mx-auto px-4 sm:px-6 lg:px-8">
+                    {children}
+                  </main>
+                </div>
+              </Providers>
+            </WalletProvider>
+          </StarknetProvider>
           <AuthModal />
           <Toaster theme="dark" position="top-right" />
         </AuthProvider>

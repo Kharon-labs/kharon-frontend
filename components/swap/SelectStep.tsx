@@ -129,7 +129,7 @@ export function SelectStep({
           onClick={onSelectPayCoin}
           className="w-full py-4 gradient-border-form rounded-xl text-white font-medium"
         >
-          Select Pay Coin
+          Swap
         </button>
       </div>
     </motion.div>

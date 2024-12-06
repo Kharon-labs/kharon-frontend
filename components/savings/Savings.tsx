@@ -1,6 +1,8 @@
 "use client";
 
 import { RefreshCw } from "lucide-react";
+import { SiWindows } from "react-icons/si";
+import { RiArrowDropDownLine } from "react-icons/ri";
 import Link from "next/link";
 
 const Savings = () => {
@@ -22,15 +24,15 @@ const Savings = () => {
           <div className="flex gap-4">
             <Link
               href="/savings/deposit"
-              className="px-8 py-3 gradient-border-form rounded-xl text-white font-medium"
+              className="px-8 py-3 bg-[#009FDF] hover:bg-[#007edf] text-[#000] rounded-xl font-medium"
             >
               Deposit
             </Link>
             <Link
               href="/savings/withdraw"
-              className="px-8 py-3 gradient-border-form rounded-xl text-white font-medium"
+              className="px-8 py-3 border border-white rounded-xl text-[#fff] hover:text-gray-300 font-medium"
             >
-              withdraw
+              Withdraw
             </Link>
           </div>
         </div>
@@ -44,19 +46,7 @@ const Savings = () => {
               <div className="w-1.5 h-1.5 bg-white rounded-sm"></div>
             </div>
             All Networks
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
+            <RiArrowDropDownLine />
           </button>
         </div>
 
