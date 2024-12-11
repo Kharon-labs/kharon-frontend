@@ -24,7 +24,6 @@ jest.mock("@/lib/stores/use-auth-store", () => ({
     user: null,
     setUser: jest.fn(),
     setToken: jest.fn(),
-    // add any other methods/properties your store uses
   })),
 }));
 
