@@ -9,7 +9,7 @@ import { ReviewStep } from "./ReviewStep";
 import { ConfirmStep } from "./ConfirmStep";
 import { getTokens } from "@/lib/coingecko";
 import { ErrorBoundary } from "react-error-boundary";
-import { LoadingSpinner } from "../ui/LoadingSpinner";
+import { LoadingSpinner } from "../ui/loading-spinner";
 import { ErrorFallback } from "./ErrorFallback";
 
 // const TOKENS: Token[] = [

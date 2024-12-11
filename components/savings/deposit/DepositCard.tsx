@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Token } from "@/interfaces/interfaces";
 import { getTokens } from "@/lib/coingecko";
 import { ErrorBoundary } from "react-error-boundary";
-import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { ErrorFallback } from "@/components/swap/ErrorFallback";
 import { DepositStep } from "./DepositStep";
 
