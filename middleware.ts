@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 const publicPaths = [
+  "/",
   "/login",
   "/signup",
   "/reset-password",
@@ -20,8 +21,13 @@ export function middleware(request: NextRequest) {
       path.match(new RegExp(publicPath.replace("[token]", ".*")))
   );
 
-  // Redirect authenticated users away from public paths
-  if (isPublicPath && token) {
+  // Allow access to landing page without redirection
+  if (path === "/") {
+    return NextResponse.next();
+  }
+
+  // Redirect authenticated users away from auth paths
+  if (isPublicPath && token && path !== "/") {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
