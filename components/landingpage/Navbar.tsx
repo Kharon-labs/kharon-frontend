@@ -21,7 +21,7 @@ export function Navbar() {
     }
 
     // If not authenticated, redirect to login page
-    router.push("/auth/login");
+    router.push("/login");
   }
 
   return (
