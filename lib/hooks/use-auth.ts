@@ -1,20 +1,50 @@
-import { useAuthStore } from "@/lib/stores/use-auth-store";
+import { useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/stores/use-auth-store";
+import {
+  loginUser,
+  logoutUser,
+  loginWithGoogle,
+} from "@/lib/services/auth-service";
 
 export function useAuth() {
-  const { user, isAuthenticated, logout, setIsModalOpen } = useAuthStore();
   const router = useRouter();
+  const {
+    user,
+    token,
+    isAuthenticated,
+    setUser,
+    setToken,
+    logout: clearAuth,
+  } = useAuthStore();
 
-  const handleLogout = () => {
-    logout();
-    localStorage.removeItem("token");
-    router.push("/");
-  };
+  const login = useCallback(
+    async (email: string, password: string) => {
+      const response = await loginUser({ email, password });
+      setUser(response.user);
+      setToken(response.token);
+      router.push("/dashboard");
+    },
+    [setUser, setToken, router]
+  );
+
+  const loginGoogle = useCallback(async () => {
+    await loginWithGoogle();
+  }, []);
+
+  const logout = useCallback(async () => {
+    if (user?.email && token) {
+      await logoutUser(user.email, token);
+      clearAuth();
+      router.push("/login");
+    }
+  }, [user, token, clearAuth, router]);
 
   return {
     user,
     isAuthenticated,
-    logout: handleLogout,
-    setIsModalOpen,
+    login,
+    loginGoogle,
+    logout,
   };
 }

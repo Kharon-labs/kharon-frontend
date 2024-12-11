@@ -10,9 +10,19 @@ import { useAuth } from "@/lib/hooks/use-auth";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { user, isAuthenticated, logout, setIsModalOpen } = useAuth();
-
+  const { user, isAuthenticated } = useAuth();
   const router = useRouter();
+
+  async function handleLaunchApp() {
+    // If authenticated, go straight to dashboard
+    if (isAuthenticated && user) {
+      router.push("/dashboard");
+      return;
+    }
+
+    // If not authenticated, redirect to login page
+    router.push("/auth/login");
+  }
 
   return (
     <nav className="bg-[#000] text-[#fff]">
@@ -70,7 +80,7 @@ export function Navbar() {
               <div className="flex items-center space-x-4">
                 <span className="text-white">Welcome, {user?.username}</span>
                 <button
-                  onClick={logout}
+                  onClick={() => router.push("/auth/logout")}
                   className="px-4 py-1 text-[#fff] font-semibold bg-[#000] border-[1px] hover:border-black border-white rounded-lg"
                 >
                   Logout
@@ -79,13 +89,13 @@ export function Navbar() {
             ) : (
               <>
                 <button
-                  onClick={() => setIsModalOpen(true)}
+                  onClick={() => router.push("/auth/login")}
                   className="px-4 py-1 text-[#fff] font-semibold bg-[#000] border-[1px] hover:border-black border-white rounded-lg"
                 >
                   Login
                 </button>
                 <button
-                  onClick={() => router.push("/dashboard")}
+                  onClick={handleLaunchApp}
                   className="px-6 py-2 bg-[#009fdf] hover:bg-[#ff00bc] text-[#000] font-semibold rounded-lg"
                 >
                   Launch App
@@ -165,7 +175,7 @@ export function Navbar() {
                 {isAuthenticated ? (
                   <li>
                     <button
-                      onClick={logout}
+                      onClick={() => router.push("/auth/logout")}
                       className="w-full text-center border border-white px-4 py-2 rounded-lg hover:bg-white hover:text-black transition"
                     >
                       Logout
@@ -175,7 +185,7 @@ export function Navbar() {
                   <>
                     <li>
                       <button
-                        onClick={() => setIsModalOpen(true)}
+                        onClick={() => router.push("/auth/login")}
                         className="w-full text-center border border-white px-4 py-2 rounded-lg hover:bg-white hover:text-black transition"
                       >
                         Login
@@ -183,7 +193,7 @@ export function Navbar() {
                     </li>
                     <li>
                       <button
-                        onClick={() => router.push("/dashboard")}
+                        onClick={handleLaunchApp}
                         className="w-full text-center bg-[#009fdf] hover:bg-[#ff00bc] px-4 py-2 rounded-lg transition"
                       >
                         Launch App

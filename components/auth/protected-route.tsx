@@ -1,30 +1,37 @@
 "use client";
 
-import { useAuthStore } from "@/lib/stores/use-auth-store";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/lib/stores/use-auth-store";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
-export function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuthStore();
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const router = useRouter();
+  const { isAuthenticated, isLoading, fetchUser } = useAuthStore();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/");
-      useAuthStore.getState().setIsModalOpen(true);
+    if (!isAuthenticated && !isLoading) {
+      fetchUser().catch(() => {
+        router.push("/login");
+      });
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, isLoading, fetchUser, router]);
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        <p className="mt-4 text-sm text-muted-foreground">
-          Loading your content...
-        </p>
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
 
-  return isAuthenticated ? children : null;
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return <>{children}</>;
 }

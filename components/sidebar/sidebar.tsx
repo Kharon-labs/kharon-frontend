@@ -1,7 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { IconCopy, IconUser } from "@tabler/icons-react";
+import { IconLoader2, IconUser } from "@tabler/icons-react";
 import {
   MdSwapVerticalCircle,
   MdCurrencyExchange,
@@ -15,29 +15,18 @@ import { GrGoogleWallet } from "react-icons/gr";
 import { IoMdNotifications } from "react-icons/io";
 import { GiEgyptianProfile } from "react-icons/gi";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { WalletConnectButton } from "../wallet/connect-button";
+import { useAuthStore } from "@/lib/stores/use-auth-store";
+import { logoutUser, logoutFromGoogle } from "@/lib/services/auth-service";
+import { Icons } from "../icons";
 
 function Sidebar() {
   const pathname = usePathname();
-  const walletAddress = "0x95223...8f41";
-  const userEmail = "user@example.com";
-  const [isCopied, setIsCopied] = useState(false);
-
-  const formatWalletAddress = (address: string) => {
-    return `${address.slice(0, 3)}...${address.slice(-2)}`;
-  };
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(walletAddress);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 5000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
+  const router = useRouter();
+  const { user, setUser, setToken } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigationItems = [
     { name: "Dashboard", icon: BiSolidDashboard, href: "/dashboard" },
@@ -51,6 +40,24 @@ function Sidebar() {
     { name: "Settings", icon: IoSettings, href: "/settings" },
     { name: "Profile", icon: GiEgyptianProfile, href: "/profile" },
   ];
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      if (user?.provider === "google") {
+        await logoutFromGoogle();
+      } else if (user?.email && user?.token) {
+        await logoutUser(user.email, user.token);
+      }
+      setUser(null);
+      setToken(null);
+      router.push("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <aside className="flex flex-col w-[80px] h-screen bg-black pt-6 fixed font-poppins">
@@ -92,14 +99,22 @@ function Sidebar() {
       </nav>
 
       <div className="px-3 py-4 border-t border-gray-800">
-        <div className="flex flex-col items-center gap-1">
+        <button
+          onClick={handleLogout}
+          disabled={isLoading}
+          className="flex flex-col items-center gap-1 w-full hover:text-[#009FDF] transition-colors"
+        >
           <div className="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center">
-            <IconUser className="w-5 h-5 text-gray-400" />
+            {isLoading ? (
+              <Icons.spinner className="w-4 h-4 animate-spin" />
+            ) : (
+              <IconUser className="w-5 h-5 text-gray-400" />
+            )}
           </div>
           <span className="text-[10px] text-gray-400 truncate w-full text-center">
-            {userEmail}
+            {user?.email || "Not logged in"}
           </span>
-        </div>
+        </button>
       </div>
     </aside>
   );
