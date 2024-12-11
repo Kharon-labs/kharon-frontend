@@ -11,6 +11,7 @@ import { Icons } from "@/components/icons";
 import { getCurrentUser } from "@/lib/services/auth-service";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Suspense } from "react";
 import {
   type OTPInput as OTPInputType,
   otpSchema,
@@ -23,7 +24,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-export default function VerifyOTPPage() {
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center min-h-screen">
+    <Icons.spinner className="h-6 w-6 animate-spin" />
+  </div>
+);
+
+function VerifyOTPContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email") as string;
@@ -123,5 +130,13 @@ export default function VerifyOTPPage() {
         </form>
       </Form>
     </AuthLayout>
+  );
+}
+
+export default function VerifyOTPPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <VerifyOTPContent />
+    </Suspense>
   );
 }

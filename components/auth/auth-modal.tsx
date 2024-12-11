@@ -3,11 +3,15 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LoginForm } from "@/components/auth/login-form";
-import { SignUpForm } from "@/components/auth/signup-form";
+import { SignupForm } from "@/components/auth/signup-form";
 import { OTPVerification } from "@/components/auth/otp-verification";
 import { useState } from "react";
 import { useAuthStore } from "@/lib/stores/use-auth-store";
 import { useRouter } from "next/navigation";
+
+interface SignupFormProps {
+  onSuccess: (userEmail: string) => void;
+}
 
 export function AuthModal() {
   const router = useRouter();
@@ -83,7 +87,9 @@ export function AuthModal() {
             <LoginForm onSuccess={handleAuthSuccess} />
           </TabsContent>
           <TabsContent value="signup" className="px-6 pb-6">
-            <SignUpForm onSuccess={handleAuthSuccess} />
+            <SignupForm
+              onSuccess={() => handleAuthSuccess("user@example.com")}
+            />
           </TabsContent>
         </Tabs>
       </DialogContent>
