@@ -18,7 +18,11 @@ import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 
-export function SignupForm() {
+interface SignupFormProps {
+  onSuccess: () => void;
+}
+
+export function SignupForm({ onSuccess }: SignupFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 

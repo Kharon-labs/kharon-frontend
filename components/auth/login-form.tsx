@@ -19,7 +19,11 @@ import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 
-export function LoginForm() {
+interface LoginFormProps {
+  onSuccess: (userEmail: string) => void;
+}
+
+export function LoginForm({ onSuccess }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { setUser, setToken } = useAuthStore();
