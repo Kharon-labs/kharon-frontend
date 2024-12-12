@@ -99,7 +99,7 @@ export async function getCurrentUser(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
+        token: token,
       },
       credentials: "include",
     }
@@ -107,10 +107,13 @@ export async function getCurrentUser(
 
   if (!response.ok) {
     const error = await response.json();
+    console.error("Dashboard API Error:", error);
     throw new Error(error.message || "Failed to fetch user details");
   }
 
-  return response.json();
+  const userData = await response.json();
+  console.log("Dashboard API Response:", userData);
+  return userData;
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {
