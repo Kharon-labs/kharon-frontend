@@ -93,15 +93,17 @@ export async function getCurrentUser(
   email: string,
   token: string
 ): Promise<User> {
-  const response = await fetch(`${API_URL}/user/dashboard`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      token: token,
-    },
-    body: JSON.stringify({ email }),
-    credentials: "include",
-  });
+  const response = await fetch(
+    `${API_URL}/user/dashboard?email=${encodeURIComponent(email)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        token: token,
+      },
+      credentials: "include",
+    }
+  );
 
   if (!response.ok) {
     const error = await response.json();
