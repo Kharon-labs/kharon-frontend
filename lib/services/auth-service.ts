@@ -96,21 +96,18 @@ export async function getCurrentUser(
   console.log("getCurrentUser called with:", {
     email,
     token,
-    url: `${API_URL}/user/dashboard?email=${encodeURIComponent(email)}`,
   });
 
-  const response = await fetch(
-    `${API_URL}/user/dashboard?email=${encodeURIComponent(email)}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-        token: token,
-      },
-      credentials: "include",
-    }
-  );
+  const response = await fetch(`${API_URL}/user/dashboard`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      token: token,
+    },
+    body: JSON.stringify({ email }),
+    credentials: "include",
+  });
 
   if (!response.ok) {
     const error = await response.json();
