@@ -88,15 +88,12 @@ export async function getCurrentUser(
   console.log("getCurrentUser called with:", { email, token });
 
   try {
-    const { data } = await api.post(
-      "/user/dashboard",
-      { email },
-      {
-        headers: {
-          token: token,
-        },
-      }
-    );
+    const { data } = await api.get("/user/dashboard", {
+      params: { email },
+      headers: {
+        token: token,
+      },
+    });
 
     console.log("Dashboard API Success Response:", data);
     return data.data;
