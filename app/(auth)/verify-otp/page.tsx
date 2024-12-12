@@ -23,6 +23,7 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "sonner";
 
 const LoadingSpinner = () => (
   <div className="flex justify-center items-center min-h-screen">
@@ -53,10 +54,22 @@ function VerifyOTPContent() {
   async function onSubmit(data: OTPInputType) {
     setIsLoading(true);
     try {
-      const response = await verifyOTP(data);
+      const response = await verifyOTP({
+        email: data.email,
+        otp: data.otp,
+      });
+
+      if (!response || !response.token) {
+        throw new Error("Invalid verification response");
+      }
+
       setToken(response.token);
 
-      const userDetails = await getCurrentUser(email, response.token);
+      const userDetails = await getCurrentUser(data.email, response.token);
+      if (!userDetails) {
+        throw new Error("Failed to get user details");
+      }
+
       setUser(userDetails);
 
       router.push("/dashboard");
@@ -65,7 +78,6 @@ function VerifyOTPContent() {
         message:
           error instanceof Error ? error.message : "OTP verification failed",
       });
-      router.push("/login");
     } finally {
       setIsLoading(false);
     }
@@ -75,11 +87,13 @@ function VerifyOTPContent() {
     setIsLoading(true);
     try {
       await resendOTP(email);
+      toast.success("Verification code resent successfully");
     } catch (error) {
       form.setError("root", {
         message:
           error instanceof Error ? error.message : "Failed to resend OTP",
       });
+      toast.error("Failed to resend verification code");
     } finally {
       setIsLoading(false);
     }

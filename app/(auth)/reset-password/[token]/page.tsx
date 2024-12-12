@@ -21,6 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "sonner";
 
 export default function ResetPasswordPage({
   params,
@@ -51,11 +52,15 @@ export default function ResetPasswordPage({
     setIsLoading(true);
     try {
       await resetPassword(data);
+      toast.success("Password reset successful");
       router.push("/login");
     } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to reset password"
+      );
       form.setError("root", {
         message:
-          error instanceof Error ? error.message : "Password reset failed",
+          error instanceof Error ? error.message : "Failed to reset password",
       });
     } finally {
       setIsLoading(false);
@@ -77,6 +82,7 @@ export default function ResetPasswordPage({
                 <FormControl>
                   <PasswordInput
                     placeholder="Enter new password"
+                    className="bg-background text-foreground border-border"
                     {...field}
                     disabled={isLoading}
                   />

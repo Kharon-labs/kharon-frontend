@@ -22,6 +22,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { toast } from "sonner";
 
 export default function RequestResetPage() {
   const router = useRouter();
@@ -42,12 +43,14 @@ export default function RequestResetPage() {
     try {
       await requestPasswordReset(data.email);
       setSuccess(true);
+      toast.success("Reset link sent to your email");
     } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to send reset link"
+      );
       form.setError("root", {
         message:
-          error instanceof Error
-            ? error.message
-            : "Failed to request password reset",
+          error instanceof Error ? error.message : "Failed to send reset link",
       });
     } finally {
       setIsLoading(false);
@@ -70,6 +73,7 @@ export default function RequestResetPage() {
                   <Input
                     type="email"
                     placeholder="name@example.com"
+                    className="bg-background text-foreground border-border"
                     {...field}
                     disabled={isLoading}
                   />

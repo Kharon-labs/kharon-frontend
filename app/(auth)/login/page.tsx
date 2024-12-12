@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { PasswordInput } from "@/components/auth/password-input";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,8 +38,10 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await loginUser(data);
+      toast.success("Login successful! Please verify your email.");
       router.push(`/verify-otp?email=${encodeURIComponent(data.email)}`);
     } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Login failed");
       form.setError("root", {
         message: error instanceof Error ? error.message : "Login failed",
       });

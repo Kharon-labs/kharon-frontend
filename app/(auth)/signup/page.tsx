@@ -19,6 +19,7 @@ import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { AuthLayout } from "@/components/auth/auth-layout";
 import { PasswordInput } from "@/components/auth/password-input";
+import { toast } from "sonner";
 
 export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,8 +38,10 @@ export default function SignupPage() {
     setIsLoading(true);
     try {
       await signupUser(data);
+      toast.success("Account created! Please verify your email.");
       router.push("/login");
     } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Signup failed");
       form.setError("root", {
         message: error instanceof Error ? error.message : "Signup failed",
       });
