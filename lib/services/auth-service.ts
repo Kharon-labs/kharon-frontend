@@ -93,12 +93,19 @@ export async function getCurrentUser(
   email: string,
   token: string
 ): Promise<User> {
+  console.log("getCurrentUser called with:", {
+    email,
+    token,
+    url: `${API_URL}/user/dashboard?email=${encodeURIComponent(email)}`,
+  });
+
   const response = await fetch(
     `${API_URL}/user/dashboard?email=${encodeURIComponent(email)}`,
     {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
         token: token,
       },
       credentials: "include",
@@ -107,12 +114,16 @@ export async function getCurrentUser(
 
   if (!response.ok) {
     const error = await response.json();
-    console.error("Dashboard API Error:", error);
+    console.error("Dashboard API Error:", {
+      status: response.status,
+      error,
+      headers: Object.fromEntries(response.headers.entries()),
+    });
     throw new Error(error.message || "Failed to fetch user details");
   }
 
   const userData = await response.json();
-  console.log("Dashboard API Response:", userData);
+  console.log("Dashboard API Success Response:", userData);
   return userData;
 }
 
