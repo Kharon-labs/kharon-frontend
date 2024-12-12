@@ -99,7 +99,7 @@ export async function getCurrentUser(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        token: token,
+        Authorization: `Bearer ${token}`,
       },
       credentials: "include",
     }
