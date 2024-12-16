@@ -8,7 +8,6 @@ const publicPaths = [
   "/reset-password",
   "/verify-otp",
   "/reset-password/[token]",
-  "/portfolio",
 ];
 
 export function middleware(request: NextRequest) {
