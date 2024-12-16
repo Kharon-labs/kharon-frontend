@@ -26,18 +26,21 @@ export function WalletDashboard() {
 
       try {
         const userProfile = await UserService.getUserByEmail(user.email);
+
         if (!userProfile?.user_uuid) {
           const newUser = await UserService.createUser({
             name: user.username || user.email.split("@")[0],
             email: user.email,
           });
 
-          if (newUser?.user_uuid) {
-            await fetchUserWallets();
-            toast.success("User profile created successfully");
-          } else {
+          if (!newUser?.user_uuid) {
             throw new Error("Failed to create user profile");
           }
+
+          setTimeout(async () => {
+            await fetchUserWallets();
+            toast.success("User profile created successfully");
+          }, 500);
         } else {
           await fetchUserWallets();
         }
