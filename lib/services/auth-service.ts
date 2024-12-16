@@ -85,8 +85,6 @@ export async function getCurrentUser(
   email: string,
   token: string
 ): Promise<User> {
-  console.log("getCurrentUser called with:", { email, token });
-
   try {
     const { data } = await api.get("/user/dashboard", {
       params: { email },
@@ -95,13 +93,8 @@ export async function getCurrentUser(
       },
     });
 
-    console.log("Dashboard API Success Response:", data);
     return data.data;
   } catch (error: any) {
-    console.error("Dashboard API Error:", {
-      status: error.response?.status,
-      error: error.response?.data,
-    });
     throw new Error(
       error.response?.data?.message || "Failed to fetch user details"
     );

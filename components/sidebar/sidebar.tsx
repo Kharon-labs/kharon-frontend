@@ -14,6 +14,7 @@ import { IoSettings } from "react-icons/io5";
 import { GrGoogleWallet } from "react-icons/gr";
 import { IoMdNotifications } from "react-icons/io";
 import { GiEgyptianProfile } from "react-icons/gi";
+import { FaBriefcase } from "react-icons/fa6";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
@@ -36,6 +37,7 @@ function Sidebar() {
     { name: "Assets", icon: GrGoogleWallet, href: "/assets" },
     { name: "Savings", icon: MdSavings, href: "/savings" },
     { name: "Transactions", icon: MdCurrencyExchange, href: "/transactions" },
+    { name: "Portfolio", icon: FaBriefcase, href: "/portfolio" },
     { name: "Notification", icon: IoMdNotifications, href: "/notification" },
     { name: "Settings", icon: IoSettings, href: "/settings" },
     { name: "Profile", icon: GiEgyptianProfile, href: "/profile" },

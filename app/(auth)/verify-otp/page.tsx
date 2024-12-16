@@ -59,8 +59,6 @@ function VerifyOTPContent() {
         otp: data.otp,
       });
 
-      console.log("Verify OTP Response:", response);
-
       if (!response || !response.token) {
         throw new Error("Invalid verification response");
       }
@@ -68,8 +66,6 @@ function VerifyOTPContent() {
       setToken(response.token);
 
       const userDetails = await getCurrentUser(data.email, response.token);
-
-      console.log("User Dashboard Response:", userDetails);
 
       if (!userDetails) {
         throw new Error("Failed to get user details");
@@ -79,7 +75,6 @@ function VerifyOTPContent() {
 
       router.push("/dashboard");
     } catch (error) {
-      console.log("Error in OTP verification:", error);
       form.setError("root", {
         message:
           error instanceof Error ? error.message : "OTP verification failed",
