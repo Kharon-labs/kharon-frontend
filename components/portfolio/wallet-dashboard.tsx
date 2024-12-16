@@ -25,12 +25,16 @@ export function WalletDashboard() {
       if (!isAuthenticated || !user?.email) return;
 
       try {
-        if (wallets.length === 0) {
+        const userProfile = await UserService.getUserByEmail(user.email);
+        if (!userProfile) {
           await UserService.createUser({
             name: user.username || user.email.split("@")[0],
             email: user.email,
           });
+          await fetchUserWallets();
           toast.success("User profile created successfully");
+        } else {
+          await fetchUserWallets();
         }
       } catch (error) {
         console.error("Error initializing user:", error);

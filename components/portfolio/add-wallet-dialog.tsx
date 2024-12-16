@@ -42,10 +42,10 @@ export function AddWalletDialog({ open, onOpenChange }: AddWalletDialogProps) {
       setIsLoading(true);
       const userProfile = await UserService.getUserByEmail(userEmail);
       console.log("User Profile:", userProfile);
-      if (!userProfile?.id) throw new Error("User ID not found");
+      if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
-      console.log("Adding wallet:", userProfile.id, address, network);
-      await addWallet(userProfile.id, address, network);
+      console.log("Adding wallet:", userProfile.user_uuid, address, network);
+      await addWallet(userProfile.user_uuid, address, network);
       toast.success("Wallet added successfully");
       onOpenChange(false);
       setAddress("");

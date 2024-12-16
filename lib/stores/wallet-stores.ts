@@ -35,9 +35,9 @@ export const useWalletStore = create<WalletState>((set) => ({
       if (!userEmail) throw new Error("User email not found");
 
       const userProfile = await UserService.getUserByEmail(userEmail);
-      if (!userProfile?.id) throw new Error("User ID not found");
+      if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
-      const wallets = await WalletService.fetchWallets(userProfile.id);
+      const wallets = await WalletService.fetchWallets(userProfile.user_uuid);
       set({ wallets, isLoading: false });
     } catch (error) {
       set({ error: (error as Error).message, isLoading: false });

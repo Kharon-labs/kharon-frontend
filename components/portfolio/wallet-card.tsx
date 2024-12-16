@@ -24,9 +24,9 @@ export function WalletCard({ wallet }: WalletCardProps) {
     try {
       setIsDeleting(true);
       const userProfile = await UserService.getUserByEmail(userEmail);
-      if (!userProfile?.id) throw new Error("User ID not found");
+      if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
-      await removeWallet(userProfile.id, wallet.address);
+      await removeWallet(userProfile.user_uuid, wallet.address);
       toast.success("Wallet removed successfully");
     } catch (error) {
       console.error("Error deleting wallet:", error);
