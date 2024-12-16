@@ -36,15 +36,25 @@ export function AddWalletDialog({ open, onOpenChange }: AddWalletDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userEmail) return;
+    if (!userEmail) {
+      toast.error("Please log in to add a wallet");
+      return;
+    }
+
+    if (!address || !network) {
+      toast.error("Please fill in all fields");
+      return;
+    }
 
     try {
       setIsLoading(true);
       const userProfile = await UserService.getUserByEmail(userEmail);
-      console.log("User Profile:", userProfile);
-      if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
-      console.log("Adding wallet:", userProfile.user_uuid, address, network);
+      if (!userProfile?.user_uuid) {
+        toast.error("User profile not found. Please try refreshing the page.");
+        return;
+      }
+
       await addWallet(userProfile.user_uuid, address, network);
       toast.success("Wallet added successfully");
       onOpenChange(false);
