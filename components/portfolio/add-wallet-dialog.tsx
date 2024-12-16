@@ -47,9 +47,11 @@ export function AddWalletDialog({ open, onOpenChange }: AddWalletDialogProps) {
     }
 
     try {
+      console.log("Email:", userEmail);
       setIsLoading(true);
       const userProfile = await UserService.getUserByEmail(userEmail);
-
+      console.log("User Profile:", userProfile);
+      console.log("User UUID:", userProfile?.user_uuid);
       if (!userProfile?.user_uuid) {
         toast.error("User profile not found. Please try refreshing the page.");
         return;
