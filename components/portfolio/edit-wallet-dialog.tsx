@@ -37,6 +37,7 @@ export function EditWalletDialog({
   const [isLoading, setIsLoading] = useState(false);
   const userEmail = useAuthStore((state) => state.user?.email);
   const updateWallet = useWalletStore((state) => state.updateWallet);
+  const fetchUserWallets = useWalletStore((state) => state.fetchUserWallets);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +56,7 @@ export function EditWalletDialog({
       }
 
       await updateWallet(userProfile.user_uuid, wallet.wallet_address, network);
+      await fetchUserWallets();
       toast.success("Wallet network updated successfully");
       onOpenChange(false);
     } catch (error) {

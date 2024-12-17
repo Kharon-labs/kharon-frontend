@@ -37,10 +37,8 @@ export function WalletDashboard() {
             throw new Error("Failed to create user profile");
           }
 
-          setTimeout(async () => {
-            await fetchUserWallets();
-            toast.success("User profile created successfully");
-          }, 500);
+          await fetchUserWallets();
+          toast.success("User profile created successfully");
         } else {
           await fetchUserWallets();
         }

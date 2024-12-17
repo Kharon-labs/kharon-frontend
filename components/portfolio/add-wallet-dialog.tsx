@@ -33,6 +33,7 @@ export function AddWalletDialog({ open, onOpenChange }: AddWalletDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
   const userEmail = useAuthStore((state) => state.user?.email);
   const addWallet = useWalletStore((state) => state.addWallet);
+  const fetchUserWallets = useWalletStore((state) => state.fetchUserWallets);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,6 +59,7 @@ export function AddWalletDialog({ open, onOpenChange }: AddWalletDialogProps) {
       }
 
       await addWallet(userProfile.user_uuid, address, network);
+      await fetchUserWallets();
       toast.success("Wallet added successfully");
       onOpenChange(false);
       setAddress("");
