@@ -6,6 +6,12 @@ import { WalletCard } from "./wallet-card";
 
 export function WalletList() {
   const wallets = useWalletStore((state) => state.wallets);
+  console.log("Wallets in WalletList component:", wallets);
+
+  if (!Array.isArray(wallets)) {
+    console.log("Wallets is not an array:", wallets);
+    return <div>Loading wallets...</div>;
+  }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

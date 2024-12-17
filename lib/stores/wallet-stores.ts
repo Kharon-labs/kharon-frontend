@@ -32,17 +32,39 @@ export const useWalletStore = create<WalletState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const userEmail = useAuthStore.getState().user?.email;
-      console.log("userEmail", userEmail);
+      console.log("Current user email:", userEmail);
+
       if (!userEmail) throw new Error("User email not found");
 
       const userProfile = await UserService.getUserByEmail(userEmail);
-      console.log("userProfile", userProfile);
+      console.log("User Profile:", userProfile);
+
       if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
-      console.log("userProfile.user_uuid", userProfile.user_uuid);
-      const wallets = await WalletService.fetchWallets(userProfile.user_uuid);
+      const rawResponse = await WalletService.fetchWallets(
+        userProfile.user_uuid
+      );
+      console.log("Raw wallet response:", rawResponse);
+
+      let parsedWallets;
+      if (typeof rawResponse === "string") {
+        try {
+          parsedWallets = JSON.parse(rawResponse);
+          console.log("Parsed wallet response:", parsedWallets);
+        } catch (parseError) {
+          console.error("Failed to parse wallet response:", parseError);
+          parsedWallets = [];
+        }
+      } else {
+        parsedWallets = rawResponse;
+      }
+
+      const wallets = Array.isArray(parsedWallets) ? parsedWallets : [];
+      console.log("Final wallets array:", wallets);
+
       set({ wallets, isLoading: false });
     } catch (error) {
+      console.error("Error in fetchUserWallets:", error);
       set({ error: (error as Error).message, isLoading: false });
       throw error;
     }
