@@ -32,11 +32,14 @@ export const useWalletStore = create<WalletState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const userEmail = useAuthStore.getState().user?.email;
+      console.log("userEmail", userEmail);
       if (!userEmail) throw new Error("User email not found");
 
       const userProfile = await UserService.getUserByEmail(userEmail);
+      console.log("userProfile", userProfile);
       if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
+      console.log("userProfile.user_uuid", userProfile.user_uuid);
       const wallets = await WalletService.fetchWallets(userProfile.user_uuid);
       set({ wallets, isLoading: false });
     } catch (error) {
