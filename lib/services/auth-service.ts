@@ -153,8 +153,30 @@ export async function logoutUser(email: string, token: string): Promise<void> {
 }
 
 export async function loginWithGoogle(): Promise<AuthResponse> {
-  window.location.href = `${API_URL}/user/google`;
-  return new Promise(() => {});
+  const googleWindow = window.open(`${API_URL}/user/google`, "_blank");
+
+  return new Promise((resolve, reject) => {
+    window.addEventListener("message", async function handleMessage(event) {
+      if (event.origin !== API_URL) return;
+
+      try {
+        googleWindow?.close();
+
+        window.removeEventListener("message", handleMessage);
+
+        const { data } = await api.get("/user/dashboard");
+
+        resolve({
+          user: data.data,
+          token: event.data.token,
+        });
+      } catch (error: any) {
+        reject(
+          new Error(error.response?.data?.message || "Google login failed")
+        );
+      }
+    });
+  });
 }
 
 export async function logoutFromGoogle(): Promise<void> {

@@ -50,6 +50,38 @@ export default function LoginPage() {
     }
   }
 
+  async function handleGoogleLogin() {
+    setIsLoading(true);
+    try {
+      await loginWithGoogle();
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/dashboard`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+
+      const { data } = await response.json();
+
+      setUser(data);
+
+      toast.success("Login successful!");
+
+      router.push("/dashboard");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Google login failed"
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <div className="container flex h-screen w-screen flex-col items-center justify-center">
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
@@ -131,9 +163,10 @@ export default function LoginPage() {
           variant="outline"
           type="button"
           disabled={isLoading}
-          onClick={() => loginWithGoogle()}
+          onClick={() => handleGoogleLogin()}
           className="text-foreground"
         >
+          {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
           <Icons.google className="mr-2 h-4 w-4" />
           <span className="text-foreground">Google</span>
         </Button>

@@ -40,41 +40,55 @@ export const useWalletStore = create<WalletState>((set) => ({
     set({ isLoading: true, error: null });
     try {
       const userEmail = useAuthStore.getState().user?.email;
-      console.log("Current user email:", userEmail);
-
       if (!userEmail) throw new Error("User email not found");
 
       const userProfile = await UserService.getUserByEmail(userEmail);
-      console.log("User Profile:", userProfile);
-
       if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
-      const rawResponse = (await WalletService.fetchWallets(
+      const rawResponse: WalletResponse = await WalletService.fetchWallets(
         userProfile.user_uuid
-      )) as WalletResponse;
-      console.log("Raw wallet response:", rawResponse);
+      );
+      console.log("Raw response type:", typeof rawResponse);
+      console.log("Raw response value:", rawResponse);
 
       let wallets: Wallet[] = [];
 
-      if (typeof rawResponse === "string" && rawResponse.length > 0) {
-        const cleanedString = rawResponse
-          .replace(/Wallet \{ /g, "{")
-          .replace(/ \}/g, "}")
-          .replace(/: /g, ":");
+      if (typeof rawResponse === "string") {
+        const trimmedResponse = (rawResponse as string).trim();
+        if (!trimmedResponse) {
+          set({ wallets: [], isLoading: false });
+          return;
+        }
 
         try {
+          const cleanedString = trimmedResponse
+            .replace(/Wallet\s*\{/g, "{")
+            .replace(/\}\s*(?=,|$)/g, "}")
+            .replace(/:\s+/g, ":")
+            .replace(/([{,])\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":');
+
+          console.log("Cleaned string:", cleanedString);
+
           const parsedData = JSON.parse(cleanedString);
+          console.log("Parsed data:", parsedData);
+
           wallets = Array.isArray(parsedData)
             ? parsedData.map((wallet) => ({
-                wallet_address: wallet.wallet_address,
+                wallet_address: wallet.wallet_address || wallet.address,
                 network: wallet.network,
               }))
-            : [];
-
-          console.log("Parsed wallets:", wallets);
-        } catch (parseError) {
-          console.error("Failed to parse wallet response:", parseError);
-          wallets = [];
+            : [parsedData].map((wallet) => ({
+                wallet_address: wallet.wallet_address || wallet.address,
+                network: wallet.network,
+              }));
+        } catch (parseError: Error | unknown) {
+          console.error("Parse error details:", parseError);
+          console.error("Failed string:", trimmedResponse);
+          throw new Error(
+            `Failed to parse wallet data: ${
+              parseError instanceof Error ? parseError.message : "Unknown error"
+            }`
+          );
         }
       } else if (Array.isArray(rawResponse)) {
         wallets = rawResponse.map((wallet) => ({
@@ -83,6 +97,7 @@ export const useWalletStore = create<WalletState>((set) => ({
         }));
       }
 
+      console.log("Final processed wallets:", wallets);
       set({ wallets, isLoading: false });
     } catch (error) {
       console.error("Error in fetchUserWallets:", error);
