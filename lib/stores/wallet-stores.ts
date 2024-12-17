@@ -23,6 +23,14 @@ interface WalletState {
   setWallets: (wallets: Wallet[]) => void;
 }
 
+//type WalletResponse = string | Wallet[];
+type WalletResponse =
+  | {
+      wallet_address: string;
+      network: string;
+    }[]
+  | string;
+
 export const useWalletStore = create<WalletState>((set) => ({
   wallets: [],
   isLoading: false,
@@ -41,26 +49,39 @@ export const useWalletStore = create<WalletState>((set) => ({
 
       if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
-      const rawResponse = await WalletService.fetchWallets(
+      const rawResponse = (await WalletService.fetchWallets(
         userProfile.user_uuid
-      );
+      )) as WalletResponse;
       console.log("Raw wallet response:", rawResponse);
 
-      let parsedWallets;
-      if (typeof rawResponse === "string") {
+      let wallets: Wallet[] = [];
+
+      if (typeof rawResponse === "string" && rawResponse.length > 0) {
+        const cleanedString = rawResponse
+          .replace(/Wallet \{ /g, "{")
+          .replace(/ \}/g, "}")
+          .replace(/: /g, ":");
+
         try {
-          parsedWallets = JSON.parse(rawResponse);
-          console.log("Parsed wallet response:", parsedWallets);
+          const parsedData = JSON.parse(cleanedString);
+          wallets = Array.isArray(parsedData)
+            ? parsedData.map((wallet) => ({
+                wallet_address: wallet.wallet_address,
+                network: wallet.network,
+              }))
+            : [];
+
+          console.log("Parsed wallets:", wallets);
         } catch (parseError) {
           console.error("Failed to parse wallet response:", parseError);
-          parsedWallets = [];
+          wallets = [];
         }
-      } else {
-        parsedWallets = rawResponse;
+      } else if (Array.isArray(rawResponse)) {
+        wallets = rawResponse.map((wallet) => ({
+          wallet_address: wallet.wallet_address,
+          network: wallet.network,
+        }));
       }
-
-      const wallets = Array.isArray(parsedWallets) ? parsedWallets : [];
-      console.log("Final wallets array:", wallets);
 
       set({ wallets, isLoading: false });
     } catch (error) {
@@ -93,7 +114,7 @@ export const useWalletStore = create<WalletState>((set) => ({
         wallet_address: address,
       });
       set((state) => ({
-        wallets: state.wallets.filter((w) => w.address !== address),
+        wallets: state.wallets.filter((w) => w.wallet_address !== address),
       }));
     } catch (error) {
       console.error("Failed to remove wallet:", error);
@@ -110,7 +131,7 @@ export const useWalletStore = create<WalletState>((set) => ({
       });
       set((state) => ({
         wallets: state.wallets.map((w) =>
-          w.address === address ? updated : w
+          w.wallet_address === address ? updated : w
         ),
       }));
     } catch (error) {

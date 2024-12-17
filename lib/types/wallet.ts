@@ -1,7 +1,4 @@
 export interface Wallet {
-  address: string;
+  wallet_address: string;
   network: string;
-  userId: string;
-  lastTransaction?: string;
-  transactionCount?: number;
 }

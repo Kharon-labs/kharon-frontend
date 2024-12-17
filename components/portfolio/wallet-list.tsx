@@ -6,19 +6,19 @@ import { WalletCard } from "./wallet-card";
 
 export function WalletList() {
   const wallets = useWalletStore((state) => state.wallets);
-  console.log("Wallets in WalletList component:", wallets);
+  const isLoading = useWalletStore((state) => state.isLoading);
+  const error = useWalletStore((state) => state.error);
 
-  if (!Array.isArray(wallets)) {
-    console.log("Wallets is not an array:", wallets);
-    return <div>Loading wallets...</div>;
-  }
+  if (isLoading) return <div>Loading wallets...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!wallets.length) return <div>No wallets found</div>;
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       <AnimatePresence>
         {wallets.map((wallet) => (
           <motion.div
-            key={wallet.address}
+            key={wallet.wallet_address}
             layout
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}

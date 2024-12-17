@@ -26,7 +26,7 @@ export function WalletCard({ wallet }: WalletCardProps) {
       const userProfile = await UserService.getUserByEmail(userEmail);
       if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
-      await removeWallet(userProfile.user_uuid, wallet.address);
+      await removeWallet(userProfile.user_uuid, wallet.wallet_address);
       toast.success("Wallet removed successfully");
     } catch (error) {
       console.error("Error deleting wallet:", error);
@@ -53,14 +53,15 @@ export function WalletCard({ wallet }: WalletCardProps) {
         <div>
           <h3 className="font-medium text-foreground">{wallet.network}</h3>
           <p className="text-sm text-muted-foreground">
-            {truncateAddress(wallet.address)}
+            {truncateAddress(wallet.wallet_address)}
           </p>
         </div>
         <Button
-          variant="destructive"
+          variant="outline"
           size="icon"
           onClick={handleDelete}
           disabled={isDeleting}
+          className="bg-black hover:bg-black/90 text-white hover:text-white border-0"
         >
           <Trash2 className="w-4 h-4" />
         </Button>
@@ -70,7 +71,10 @@ export function WalletCard({ wallet }: WalletCardProps) {
         variant="outline"
         className="w-full text-foreground"
         onClick={() =>
-          window.open(getExplorerUrl(wallet.network, wallet.address), "_blank")
+          window.open(
+            getExplorerUrl(wallet.network, wallet.wallet_address),
+            "_blank"
+          )
         }
       >
         <ExternalLink className="w-4 h-4 mr-2" />
