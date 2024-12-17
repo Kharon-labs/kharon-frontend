@@ -51,10 +51,10 @@ export function WalletCard({ wallet }: WalletCardProps) {
     <Card className="p-4 space-y-4 bg-background">
       <div className="flex justify-between items-start">
         <div>
-          <h3 className="font-medium text-foreground">{wallet.network}</h3>
-          <p className="text-sm text-muted-foreground">
+          <h3 className="font-medium text-foreground">
             {truncateAddress(wallet.wallet_address)}
-          </p>
+          </h3>
+          <p className="text-sm text-muted-foreground">{wallet.network}</p>
         </div>
         <Button
           variant="outline"

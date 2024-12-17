@@ -1,6 +1,6 @@
 export function truncateAddress(
   address: string,
-  startLength = 6,
+  startLength = 7,
   endLength = 4
 ): string {
   if (!address) return "";
