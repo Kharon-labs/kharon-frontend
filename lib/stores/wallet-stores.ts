@@ -17,7 +17,7 @@ interface WalletState {
   removeWallet: (userId: string, address: string) => Promise<void>;
   updateWallet: (
     userId: string,
-    address: string,
+    walletAddress: string,
     newNetwork: string
   ) => Promise<void>;
   setWallets: (wallets: Wallet[]) => void;
@@ -134,21 +134,32 @@ export const useWalletStore = create<WalletState>((set) => ({
     }
   },
 
-  updateWallet: async (userId, address, newNetwork) => {
+  updateWallet: async (
+    userId: string,
+    walletAddress: string,
+    newNetwork: string
+  ) => {
+    set({ isLoading: true, error: null });
     try {
-      const updated = await WalletService.updateWallet({
+      const updatedWallet = await WalletService.updateWallet({
         user_id: userId,
-        wallet_address: address,
+        wallet_address: walletAddress,
         new_network: newNetwork,
       });
+
       set((state) => ({
         wallets: state.wallets.map((w) =>
-          w.wallet_address === address ? updated : w
+          w.wallet_address === walletAddress ? updatedWallet : w
         ),
       }));
     } catch (error) {
-      console.error("Failed to update wallet:", error);
+      set({
+        error:
+          error instanceof Error ? error.message : "Failed to update wallet",
+      });
       throw error;
+    } finally {
+      set({ isLoading: false });
     }
   },
 

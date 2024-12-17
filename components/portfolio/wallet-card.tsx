@@ -2,12 +2,13 @@ import { useState } from "react";
 import { Wallet } from "@/lib/types/wallet";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Trash2, ExternalLink } from "lucide-react";
+import { Trash2, ExternalLink, Edit } from "lucide-react";
 import { truncateAddress } from "@/lib/utils/truncate-address";
 import { useWalletStore } from "@/lib/stores/wallet-stores";
 import { useAuthStore } from "@/lib/stores/use-auth-store";
 import { UserService } from "@/lib/services/user-service";
 import { toast } from "sonner";
+import { EditWalletDialog } from "@/components/portfolio/edit-wallet-dialog";
 
 interface WalletCardProps {
   wallet: Wallet;
@@ -15,6 +16,7 @@ interface WalletCardProps {
 
 export function WalletCard({ wallet }: WalletCardProps) {
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false);
   const removeWallet = useWalletStore((state) => state.removeWallet);
   const userEmail = useAuthStore((state) => state.user?.email);
 
@@ -56,15 +58,25 @@ export function WalletCard({ wallet }: WalletCardProps) {
           </h3>
           <p className="text-sm text-muted-foreground">{wallet.network}</p>
         </div>
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={handleDelete}
-          disabled={isDeleting}
-          className="bg-black hover:bg-black/90 text-white hover:text-white border-0"
-        >
-          <Trash2 className="w-4 h-4" />
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setIsEditOpen(true)}
+            className="bg-background hover:bg-background/90"
+          >
+            <Edit className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="bg-black hover:bg-black/90 text-white hover:text-white border-0"
+          >
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
       <Button
@@ -80,6 +92,12 @@ export function WalletCard({ wallet }: WalletCardProps) {
         <ExternalLink className="w-4 h-4 mr-2" />
         View on Explorer
       </Button>
+
+      <EditWalletDialog
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
+        wallet={wallet}
+      />
     </Card>
   );
 }
