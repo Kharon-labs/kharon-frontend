@@ -45,16 +45,13 @@ export const useWalletStore = create<WalletState>((set) => ({
       const userProfile = await UserService.getUserByEmail(userEmail);
       if (!userProfile?.user_uuid) throw new Error("User UUID not found");
 
-      const rawResponse: WalletResponse = await WalletService.fetchWallets(
+      const rawResponse: WalletResponse = (await WalletService.fetchWallets(
         userProfile.user_uuid
-      );
-      console.log("Raw response type:", typeof rawResponse);
-      console.log("Raw response value:", rawResponse);
-
+      )) as WalletResponse;
       let wallets: Wallet[] = [];
 
       if (typeof rawResponse === "string") {
-        const trimmedResponse = (rawResponse as string).trim();
+        const trimmedResponse = rawResponse.trim();
         if (!trimmedResponse) {
           set({ wallets: [], isLoading: false });
           return;
@@ -63,25 +60,25 @@ export const useWalletStore = create<WalletState>((set) => ({
         try {
           const cleanedString = trimmedResponse
             .replace(/Wallet\s*\{/g, "{")
-            .replace(/\}\s*(?=,|$)/g, "}")
-            .replace(/:\s+/g, ":")
-            .replace(/([{,])\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*:/g, '$1"$2":');
+            .replace(/\}\s*(?=,|$)/g, "}");
 
-          console.log("Cleaned string:", cleanedString);
+          const parsedData = cleanedString
+            .replace(/([{,]\s*)([\w_]+):/g, '$1"$2":')
+            .replace(/:\s*(\w+)\s*([},])/g, ':"$1"$2');
 
-          const parsedData = JSON.parse(cleanedString);
-          console.log("Parsed data:", parsedData);
+          console.log("Final cleaned string:", parsedData);
+          const walletData = JSON.parse(parsedData);
 
-          wallets = Array.isArray(parsedData)
-            ? parsedData.map((wallet) => ({
+          wallets = Array.isArray(walletData)
+            ? walletData.map((wallet) => ({
                 wallet_address: wallet.wallet_address || wallet.address,
                 network: wallet.network,
               }))
-            : [parsedData].map((wallet) => ({
+            : [walletData].map((wallet) => ({
                 wallet_address: wallet.wallet_address || wallet.address,
                 network: wallet.network,
               }));
-        } catch (parseError: Error | unknown) {
+        } catch (parseError) {
           console.error("Parse error details:", parseError);
           console.error("Failed string:", trimmedResponse);
           throw new Error(
