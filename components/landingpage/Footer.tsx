@@ -190,14 +190,7 @@ const Footer = () => {
                 Public API Dashboard
               </Link>
             </li>
-            <li>
-              <Link
-                href="#"
-                className="hover:text-gray-400 text-sm sm:text-base lg:text-lg"
-              >
-                CoinStats News Feed
-              </Link>
-            </li>
+
             <li>
               <Link
                 href="#"
