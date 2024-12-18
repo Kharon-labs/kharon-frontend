@@ -77,7 +77,7 @@ export const UserService = {
       throw error;
     }
   },
-  async getUserByEmail(email: string): Promise<User> {
+  async getUserByEmail(email: string): Promise<User | null> {
     try {
       const response = await api.get(`/user/by-email/${email}`);
       console.log("Raw API response:", response.data);
@@ -89,6 +89,11 @@ export const UserService = {
       return parsedUser;
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        if (error.response?.status === 404) {
+          console.log("User not found, will create new user");
+          return null;
+        }
+
         console.error("API Error:", {
           status: error.response?.status,
           data: error.response?.data,

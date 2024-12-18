@@ -25,31 +25,45 @@ export function WalletDashboard() {
       if (!isAuthenticated || !user?.email) return;
 
       try {
+        console.log("Initializing user with email:", user.email);
+
         const userProfile = await UserService.getUserByEmail(user.email);
+        console.log("User profile response:", userProfile);
 
         if (!userProfile?.user_uuid) {
+          console.log("Creating new user...");
           const newUser = await UserService.createUser({
             name: user.username || user.email.split("@")[0],
             email: user.email,
           });
+          console.log("New user created:", newUser);
 
           if (!newUser?.user_uuid) {
-            throw new Error("Failed to create user profile");
+            console.error("No user_uuid in created user:", newUser);
+            throw new Error("Failed to create user profile: Missing user_uuid");
           }
 
+          console.log("Fetching wallets for new user...");
           await fetchUserWallets();
           toast.success("User profile created successfully");
         } else {
+          console.log("Existing user found, fetching wallets...");
           await fetchUserWallets();
         }
       } catch (error) {
-        console.error("Error initializing user:", error);
-        toast.error("Failed to initialize user profile");
+        const errorMessage =
+          error instanceof Error ? error.message : "Unknown error";
+        console.error("Error initializing user:", {
+          error,
+          email: user.email,
+          message: errorMessage,
+        });
+        toast.error(`Failed to initialize user profile: ${errorMessage}`);
       }
     };
 
     initializeUser();
-  }, [isAuthenticated, user?.email, fetchUserWallets]);
+  }, [isAuthenticated, user?.email, fetchUserWallets, user?.username]);
 
   if (error) {
     return (
