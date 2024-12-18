@@ -100,7 +100,7 @@ export function Navbar() {
               <div className="flex items-center space-x-4">
                 <span className="text-white">Welcome, {user?.username}</span>
                 <button
-                  onClick={() => router.push("/auth/logout")}
+                  onClick={handleLogout}
                   className="px-4 py-1 text-[#fff] font-semibold bg-[#000] border-[1px] hover:border-black border-white rounded-lg"
                 >
                   Logout
