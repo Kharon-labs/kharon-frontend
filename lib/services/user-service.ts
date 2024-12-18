@@ -15,38 +15,50 @@ interface CreateUserPayload {
   email: string;
 }
 
-const parseUserResponse = (data: string): User | null => {
+const parseUserResponse = (data: any): User | null => {
   try {
-    const cleanData = data.replace("User Profile: ", "");
+    if (typeof data === "object" && data !== null) {
+      return data as User;
+    }
 
-    const match = cleanData.match(/User\s*{([^}]+)}/);
-    if (!match) return null;
+    if (typeof data === "string") {
+      try {
+        const jsonData = JSON.parse(data);
+        return jsonData as User;
+      } catch {
+        const cleanData = data.replace("User Profile: ", "");
+        const match = cleanData.match(/User\s*{([^}]+)}/);
+        if (!match) return null;
 
-    const objContent = match[1];
-    const pairs = objContent.split(",").map((pair) => pair.trim());
+        const objContent = match[1];
+        const pairs = objContent.split(",").map((pair) => pair.trim());
 
-    const obj = {} as User;
-    pairs.forEach((pair) => {
-      const [key, value] = pair.split(":").map((s) => s.trim());
-      const cleanKey = key.replace(/['"]/g, "");
+        const obj = {} as User;
+        pairs.forEach((pair) => {
+          const [key, value] = pair.split(":").map((s) => s.trim());
+          const cleanKey = key.replace(/['"]/g, "");
 
-      let processedValue;
-      if (value === "[]") {
-        processedValue = [];
-      } else if (value.startsWith('"') && value.endsWith('"')) {
-        processedValue = value.slice(1, -1);
-      } else if (value === "null" || value === "undefined") {
-        processedValue = null;
-      } else {
-        processedValue = value;
+          let processedValue;
+          if (value === "[]") {
+            processedValue = [];
+          } else if (value.startsWith('"') && value.endsWith('"')) {
+            processedValue = value.slice(1, -1);
+          } else if (value === "null" || value === "undefined") {
+            processedValue = null;
+          } else {
+            processedValue = value;
+          }
+
+          (obj as any)[cleanKey] = processedValue;
+        });
+
+        return obj;
       }
+    }
 
-      (obj as any)[cleanKey] = processedValue;
-    });
-
-    return obj;
+    return null;
   } catch (error) {
-    console.error("Error parsing user response:", error);
+    console.error("Error parsing user response:", error, "Raw data:", data);
     return null;
   }
 };
@@ -67,16 +79,24 @@ export const UserService = {
   },
   async getUserByEmail(email: string): Promise<User> {
     try {
-      const { data } = await api.get<string>(`/user/by-email/${email}`);
-      const parsedUser = parseUserResponse(data);
+      const response = await api.get(`/user/by-email/${email}`);
+      console.log("Raw API response:", response.data);
+
+      const parsedUser = parseUserResponse(response.data);
       if (!parsedUser) {
         throw new Error("Failed to parse user data");
       }
       return parsedUser;
     } catch (error) {
       if (axios.isAxiosError(error)) {
+        console.error("API Error:", {
+          status: error.response?.status,
+          data: error.response?.data,
+          headers: error.response?.headers,
+        });
         throw new Error(
-          error.response?.data?.message || "Failed to fetch user profile"
+          error.response?.data?.message ||
+            `Failed to fetch user profile: ${error.message}`
         );
       }
       throw error;
