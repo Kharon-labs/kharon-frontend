@@ -89,12 +89,6 @@ export function Navbar() {
             ) : (
               <>
                 <button
-                  onClick={() => router.push("/auth/login")}
-                  className="px-4 py-1 text-[#fff] font-semibold bg-[#000] border-[1px] hover:border-black border-white rounded-lg"
-                >
-                  Login
-                </button>
-                <button
                   onClick={handleLaunchApp}
                   className="px-6 py-2 bg-[#009fdf] hover:bg-[#ff00bc] text-[#000] font-semibold rounded-lg"
                 >

@@ -1,0 +1,33 @@
+.container {
+  position: relative;
+  width: 100%;
+}
+
+.imageWrapper {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  transform-origin: center;
+  will-change: transform, filter;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.imageWrapper:hover {
+  animation: distort 2s ease-in-out infinite;
+}
+
+@keyframes distort {
+  0%,
+  100% {
+    border-radius: 24px;
+  }
+  50% {
+    border-radius: 32px 16px 28px 20px;
+  }
+}
