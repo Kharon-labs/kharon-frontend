@@ -7,22 +7,42 @@ import { ImCoinYen } from "react-icons/im";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { logoutUser } from "@/lib/services/auth-service";
+import { logoutFromGoogle } from "@/lib/services/auth-service";
+import { useAuthStore } from "@/lib/stores/use-auth-store";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
+  const { user: userStore, setUser, setToken } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   async function handleLaunchApp() {
-    // If authenticated, go straight to dashboard
     if (isAuthenticated && user) {
       router.push("/dashboard");
       return;
     }
-
-    // If not authenticated, redirect to login page
     router.push("/login");
   }
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      if (user?.provider === "google") {
+        await logoutFromGoogle();
+      } else if (user?.email && user?.token) {
+        await logoutUser(user.email, user.token);
+      }
+      setUser(null);
+      setToken(null);
+      router.push("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <nav className="bg-[#000] text-[#fff]">
@@ -169,7 +189,7 @@ export function Navbar() {
                 {isAuthenticated ? (
                   <li>
                     <button
-                      onClick={() => router.push("/auth/logout")}
+                      onClick={handleLogout}
                       className="w-full text-center border border-white px-4 py-2 rounded-lg hover:bg-white hover:text-black transition"
                     >
                       Logout
