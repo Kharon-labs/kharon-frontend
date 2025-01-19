@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Icons } from "@/components/icons";
 import { useRouter } from "next/navigation";
 import { PasswordInput } from "@/components/auth/password-input";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,11 +38,45 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await loginUser(data);
+      toast.success("Login successful! Please verify your email.");
       router.push(`/verify-otp?email=${encodeURIComponent(data.email)}`);
     } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Login failed");
       form.setError("root", {
         message: error instanceof Error ? error.message : "Login failed",
       });
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  async function handleGoogleLogin() {
+    setIsLoading(true);
+    try {
+      await loginWithGoogle();
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/user/dashboard`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+
+      const { data } = await response.json();
+
+      setUser(data);
+
+      toast.success("Login successful!");
+
+      router.push("/dashboard");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Google login failed"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -128,9 +163,10 @@ export default function LoginPage() {
           variant="outline"
           type="button"
           disabled={isLoading}
-          onClick={() => loginWithGoogle()}
+          onClick={() => handleGoogleLogin()}
           className="text-foreground"
         >
+          {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
           <Icons.google className="mr-2 h-4 w-4" />
           <span className="text-foreground">Google</span>
         </Button>

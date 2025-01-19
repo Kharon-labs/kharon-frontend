@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  user_uuid: string;
   email: string;
   name?: string;
   isVerified: boolean;

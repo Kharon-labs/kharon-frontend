@@ -68,6 +68,14 @@
   }
 }
 
+.gradient-text {
+  background: linear-gradient(to right, #ff00bc, #009fdf);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+}
+
 /* Swap card gradient border */
 .gradient-border-swap {
   background: linear-gradient(

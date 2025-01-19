@@ -54,7 +54,7 @@ export function OTPInput({
           value={digit}
           onChange={(e) => handleChange(index, e.target.value)}
           onKeyDown={(e) => handleKeyDown(index, e)}
-          className="w-12 h-12 text-center text-xl"
+          className="w-12 h-12 text-center text-xl bg-background text-foreground border-border"
           disabled={disabled}
         />
       ))}

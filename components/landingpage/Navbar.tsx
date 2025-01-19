@@ -7,22 +7,42 @@ import { ImCoinYen } from "react-icons/im";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/hooks/use-auth";
+import { logoutUser } from "@/lib/services/auth-service";
+import { logoutFromGoogle } from "@/lib/services/auth-service";
+import { useAuthStore } from "@/lib/stores/use-auth-store";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, isAuthenticated } = useAuth();
+  const { user: userStore, setUser, setToken } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   async function handleLaunchApp() {
-    // If authenticated, go straight to dashboard
     if (isAuthenticated && user) {
       router.push("/dashboard");
       return;
     }
-
-    // If not authenticated, redirect to login page
-    router.push("/auth/login");
+    router.push("/login");
   }
+
+  const handleLogout = async () => {
+    setIsLoading(true);
+    try {
+      if (user?.provider === "google") {
+        await logoutFromGoogle();
+      } else if (user?.email && user?.token) {
+        await logoutUser(user.email, user.token);
+      }
+      setUser(null);
+      setToken(null);
+      router.push("/");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <nav className="bg-[#000] text-[#fff]">
@@ -80,7 +100,7 @@ export function Navbar() {
               <div className="flex items-center space-x-4">
                 <span className="text-white">Welcome, {user?.username}</span>
                 <button
-                  onClick={() => router.push("/auth/logout")}
+                  onClick={handleLogout}
                   className="px-4 py-1 text-[#fff] font-semibold bg-[#000] border-[1px] hover:border-black border-white rounded-lg"
                 >
                   Logout
@@ -88,12 +108,6 @@ export function Navbar() {
               </div>
             ) : (
               <>
-                <button
-                  onClick={() => router.push("/auth/login")}
-                  className="px-4 py-1 text-[#fff] font-semibold bg-[#000] border-[1px] hover:border-black border-white rounded-lg"
-                >
-                  Login
-                </button>
                 <button
                   onClick={handleLaunchApp}
                   className="px-6 py-2 bg-[#009fdf] hover:bg-[#ff00bc] text-[#000] font-semibold rounded-lg"
@@ -175,7 +189,7 @@ export function Navbar() {
                 {isAuthenticated ? (
                   <li>
                     <button
-                      onClick={() => router.push("/auth/logout")}
+                      onClick={handleLogout}
                       className="w-full text-center border border-white px-4 py-2 rounded-lg hover:bg-white hover:text-black transition"
                     >
                       Logout

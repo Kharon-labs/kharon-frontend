@@ -1,6 +1,15 @@
+import axios from "axios";
 import { User } from "@/lib/stores/use-auth-store";
 
 const API_URL = "https://kharon-server.onrender.com";
+
+const api = axios.create({
+  baseURL: API_URL,
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
 interface AuthResponse {
   user: User;
@@ -16,19 +25,16 @@ export async function signupUser({
   password: string;
   password2: string;
 }): Promise<AuthResponse> {
-  const response = await fetch(`${API_URL}/api/v1/auth/signup`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, password2 }),
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Signup failed");
+  try {
+    const { data } = await api.post("/api/v1/auth/signup", {
+      email,
+      password,
+      password2,
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Signup failed");
   }
-
-  return response.json();
 }
 
 export async function loginUser({
@@ -38,19 +44,15 @@ export async function loginUser({
   email: string;
   password: string;
 }): Promise<AuthResponse> {
-  const response = await fetch(`${API_URL}/user/login`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Login failed");
+  try {
+    const { data } = await api.post("/user/login", {
+      email,
+      password,
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Login failed");
   }
-
-  return response.json();
 }
 
 export async function verifyOTP({
@@ -60,32 +62,22 @@ export async function verifyOTP({
   email: string;
   otp: string;
 }): Promise<AuthResponse> {
-  const response = await fetch(`${API_URL}/api/v1/auth/verifyOTP`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, otp }),
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "OTP verification failed");
+  try {
+    const { data } = await api.post("/api/v1/auth/verifyOTP", {
+      email,
+      otp,
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "OTP verification failed");
   }
-
-  return response.json();
 }
 
 export async function resendOTP(email: string): Promise<void> {
-  const response = await fetch(`${API_URL}/user/sendOTP`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to resend OTP");
+  try {
+    await api.post("/user/sendOTP", { email });
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Failed to resend OTP");
   }
 }
 
@@ -93,38 +85,32 @@ export async function getCurrentUser(
   email: string,
   token: string
 ): Promise<User> {
-  const response = await fetch(`${API_URL}/user/dashboard`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      token: token,
-    },
-    body: JSON.stringify({ email }),
-    credentials: "include",
-  });
+  try {
+    const { data } = await api.get("/user/dashboard", {
+      params: { email },
+      headers: {
+        token: token,
+      },
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to fetch user details");
+    return data.data;
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to fetch user details"
+    );
   }
-
-  return response.json();
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {
-  const response = await fetch(`${API_URL}/api/v1/auth/requestResetPassword`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
+  try {
+    await api.post("/api/v1/auth/requestResetPassword", {
       email,
       redirectUrl: `${window.location.origin}/reset-password`,
-    }),
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Failed to request password reset");
+    });
+  } catch (error: any) {
+    throw new Error(
+      error.response?.data?.message || "Failed to request password reset"
+    );
   }
 }
 
@@ -139,53 +125,65 @@ export async function resetPassword({
   password2: string;
   token: string;
 }): Promise<void> {
-  const response = await fetch(`${API_URL}/api/v1/auth/resetPassword`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, password2, token }),
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Password reset failed");
+  try {
+    await api.post("/api/v1/auth/resetPassword", {
+      email,
+      password,
+      password2,
+      token,
+    });
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Password reset failed");
   }
 }
 
 export async function logoutUser(email: string, token: string): Promise<void> {
-  const response = await fetch(`${API_URL}/user/logout`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      token: token,
-    },
-    body: JSON.stringify({ email }),
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Logout failed");
+  try {
+    await api.post(
+      "/user/logout",
+      { email },
+      {
+        headers: { token },
+      }
+    );
+    window.location.href = "/";
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Logout failed");
   }
-
-  window.location.href = "/";
 }
 
 export async function loginWithGoogle(): Promise<AuthResponse> {
-  window.location.href = `${API_URL}/user/google`;
-  return new Promise(() => {});
+  const googleWindow = window.open(`${API_URL}/user/google`, "_blank");
+
+  return new Promise((resolve, reject) => {
+    window.addEventListener("message", async function handleMessage(event) {
+      if (event.origin !== API_URL) return;
+
+      try {
+        googleWindow?.close();
+
+        window.removeEventListener("message", handleMessage);
+
+        const { data } = await api.get("/user/dashboard");
+
+        resolve({
+          user: data.data,
+          token: event.data.token,
+        });
+      } catch (error: any) {
+        reject(
+          new Error(error.response?.data?.message || "Google login failed")
+        );
+      }
+    });
+  });
 }
 
 export async function logoutFromGoogle(): Promise<void> {
-  const response = await fetch(`${API_URL}/user/google/logout`, {
-    method: "POST",
-    credentials: "include",
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || "Google logout failed");
+  try {
+    await api.post("/user/google/logout");
+    window.location.href = "/";
+  } catch (error: any) {
+    throw new Error(error.response?.data?.message || "Google logout failed");
   }
-
-  window.location.href = "/";
 }
